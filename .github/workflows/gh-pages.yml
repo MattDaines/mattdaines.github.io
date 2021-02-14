@@ -20,6 +20,11 @@ jobs:
           hugo-version: "latest"
           # extended: true
 
+      - name: Update Avatar in Theme Folder
+        run: |
+          rm ./themes/hugo-theme-stack/assets/img/avatar.png
+          cp ./content/img/avatar.jpeg ./themes/hugo-theme-stack/assets/img/avatar.jpeg
+
       - name: Build
         run: hugo --minify
 
