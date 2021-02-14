@@ -10,3 +10,8 @@ git submodule add https://github.com/CaiJimmy/hugo-theme-stack/ themes/hugo-them
 
 Remove config.toml
 Copy themes/hugo-theme-stack/exampleSite/*  to blog/*
+
+References:
+https://gohugo.io/hosting-and-deployment/hosting-on-github/
+https://docs.stack.jimmycai.com/writing
+https://github.com/peaceiris/actions-gh-pages
