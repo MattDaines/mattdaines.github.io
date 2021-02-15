@@ -1,1 +1,147 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Matt Daines</title><link>https://mattdaines.github.io/</link><description>Recent content on Matt Daines</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Sun, 14 Feb 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mattdaines.github.io/index.xml" rel="self" type="application/rss+xml"/></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Matt Daines</title><link>https://mattdaines.github.io/</link><description>Recent content on Matt Daines</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Mon, 15 Feb 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mattdaines.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Building DevTest Labs ARM Template Policies</title><link>https://mattdaines.github.io/p/building-devtest-labs-arm-template-policies/</link><pubDate>Mon, 15 Feb 2021 00:00:00 +0000</pubDate><guid>https://mattdaines.github.io/p/building-devtest-labs-arm-template-policies/</guid><description>&lt;p>I&amp;rsquo;ve recently been ARM templating again! In this article I&amp;rsquo;ll go through how I&amp;rsquo;ve templated a relatively troublesome resource: &lt;code>Microsoft.DevTestLab/labs/policysets/policies&lt;/code>. The documentation for this resource type is quite scarce so I figured I&amp;rsquo;d try figure out how to template at least some of the policies. Maybe you&amp;rsquo;ll find something useful.&lt;/p>
+&lt;h3 id="devtest-labs-parent-resource">DevTest Labs Parent Resource&lt;/h3>
+&lt;p>This resource is relatively simple; shouldn&amp;rsquo;t have too much of an issue here! Not going into detail here but for completeness, this is what I used as my parent.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[parameters(&amp;#39;devTestLabName&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;location&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[parameters(&amp;#39;location&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;labStorageType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Premium&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;premiumDataDisks&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="userownedlabvmcount">UserOwnedLabVmCount&lt;/h3>
+&lt;p>This is where I first realised that threshold only accepts a string. My first assumption was that another field (factData) held strings and threshold held integers. That&amp;rsquo;s not the case.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(parameters(&amp;#39;devTestLabName&amp;#39;), &amp;#39;/default/UserOwnedLabVmCount&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs/policysets/policies&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;dependsOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;[resourceId(&amp;#39;Microsoft.DevTestLab/labs&amp;#39;, parameters(&amp;#39;devTestLabName&amp;#39;))]&amp;#34;&lt;/span>
+&lt;span class="p">],&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;factName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;UserOwnedLabVmCount&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;evaluatorType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;MaxValuePolicy&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>There doesn&amp;rsquo;t appear to be a max value for UserOwnedLabVmCount. I tried 999,999 and it took. If that&amp;rsquo;s something you&amp;rsquo;d like to control in a parameter you can use a parameter of type int where you can set maxValue then for the threshold property use:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="s2">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="s2">&amp;#34;[string(parameter(&amp;#39;UserOwnedLabVmCountValue&amp;#39;))]&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="userownedlabpremiumvmcount">UserOwnedLabPremiumVmCount&lt;/h3>
+&lt;p>Practically identical to the above!&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(parameters(&amp;#39;devTestLabName&amp;#39;), &amp;#39;/default/UserOwnedLabPremiumVmCount&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs/policysets/policies&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;dependsOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;[resourceId(&amp;#39;Microsoft.DevTestLab/labs&amp;#39;, parameters(&amp;#39;devTestLabName&amp;#39;))]&amp;#34;&lt;/span>
+&lt;span class="p">],&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;factName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;UserOwnedLabPremiumVmCount&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;evaluatorType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;MaxValuePolicy&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="labvmcount">LabVmCount&lt;/h3>
+&lt;p>Another practically identical resource to the two previous policies&amp;hellip; If only they were all this easy!&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(parameters(&amp;#39;devTestLabName&amp;#39;), &amp;#39;/default/LabVmCount&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs/policysets/policies&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;dependsOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;[resourceId(&amp;#39;Microsoft.DevTestLab/labs&amp;#39;, parameters(&amp;#39;devTestLabName&amp;#39;))]&amp;#34;&lt;/span>
+&lt;span class="p">],&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;factName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;LabVmCount&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;10&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;evaluatorType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;MaxValuePolicy&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="labpremiumvmcount">LabPremiumVmCount&lt;/h3>
+&lt;p>And again&amp;hellip; But this time a little caveat. This policy requires that the DevTest lab property &lt;code>labStorageType&lt;/code> is set to &lt;code>Premium&lt;/code>. ARM will throw a seemingly unrelated error if this is not set. I learnt this as initially my DevTest lab was set to StandardSSD.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(parameters(&amp;#39;devTestLabName&amp;#39;), &amp;#39;/default/LabPremiumVmCount&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs/policysets/policies&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;dependsOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;[resourceId(&amp;#39;Microsoft.DevTestLab/labs&amp;#39;, parameters(&amp;#39;devTestLabName&amp;#39;))]&amp;#34;&lt;/span>
+&lt;span class="p">],&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;factName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;LabPremiumVmCount&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;10&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;evaluatorType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;MaxValuePolicy&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="labvmsize">LabVmSize&lt;/h3>
+&lt;p>Okay, this one is different. Really. It&amp;rsquo;s our first policy that doesn&amp;rsquo;t just require a integer (.. as a string).&lt;/p>
+&lt;p>The solution for LabVmSize is to use a parameter of type array and parse that as a string. The array is just your standard Azure VM sizes in a list. To be verbose, this is the template resource component:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(parameters(&amp;#39;devTestLabName&amp;#39;), &amp;#39;/default/LabVmSize&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs/policysets/policies&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;dependsOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;[resourceId(&amp;#39;Microsoft.DevTestLab/labs&amp;#39;, parameters(&amp;#39;devTestLabName&amp;#39;))]&amp;#34;&lt;/span>
+&lt;span class="p">],&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;factName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;LabVmSize&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[string(parameters(&amp;#39;allowedLabVmSizes&amp;#39;))]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;evaluatorType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;AllowedValuesPolicy&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>And the parameter component:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="s2">&amp;#34;allowedLabVmSizes&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;Basic_A0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="s2">&amp;#34;Basic_A1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="s2">&amp;#34;Basic_A2&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="s2">&amp;#34;Basic_A3&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="s2">&amp;#34;Basic_A4&amp;#34;&lt;/span>
+&lt;span class="p">]&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="galleryimage">GalleryImage&lt;/h3>
+&lt;p>This one beat me. I searched for &lt;code>&amp;quot;/default/GalleryImage&amp;quot;&lt;/code> and found another blog that had managed to template this value. I wonder if they struggled as much as I did.&lt;/p>
+&lt;p>At first glance this policy is very similar to the one directly above. It accepts a JSON array as a string containing the usual details about the image reference. But for reasons that are beyond my comprehension they wouldn&amp;rsquo;t stick. So, this is the template:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(parameters(&amp;#39;devTestLabName&amp;#39;), &amp;#39;/default/GalleryImage&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Microsoft.DevTestLab/labs/policysets/policies&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;apiVersion&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2018-09-15&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;dependsOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;span class="s2">&amp;#34;[resourceId(&amp;#39;Microsoft.DevTestLab/labs&amp;#39;, parameters(&amp;#39;devTestLabName&amp;#39;))]&amp;#34;&lt;/span>
+&lt;span class="p">],&lt;/span>
+&lt;span class="nt">&amp;#34;properties&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;status&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;factName&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;GalleryImage&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;threshold&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;[concat(&amp;#39;[&amp;#39;, trim(parameters(&amp;#39;allowedLabGalleryImages&amp;#39;)), &amp;#39;]&amp;#39;)]&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="nt">&amp;#34;evaluatorType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;AllowedValuesPolicy&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>And as messy as it looks, this is how to provide a parameter file value to this resource.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="s2">&amp;#34;allowedLabGalleryImages&amp;#34;&lt;/span>&lt;span class="err">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="nt">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;\&amp;#34;{\\\&amp;#34;offer\\\&amp;#34;:\\\&amp;#34;WindowsServer\\\&amp;#34;,\\\&amp;#34;publisher\\\&amp;#34;:\\\&amp;#34;MicrosoftWindowsServer\\\&amp;#34;,\\\&amp;#34;sku\\\&amp;#34;:\\\&amp;#34;2019-Datacenter\\\&amp;#34;,\\\&amp;#34;osType\\\&amp;#34;:\\\&amp;#34;Windows\\\&amp;#34;,\\\&amp;#34;version\\\&amp;#34;:\\\&amp;#34;latest\\\&amp;#34;}\&amp;#34;,\&amp;#34;{\\\&amp;#34;offer\\\&amp;#34;:\\\&amp;#34;WindowsServer\\\&amp;#34;,\\\&amp;#34;publisher\\\&amp;#34;:\\\&amp;#34;MicrosoftWindowsServer\\\&amp;#34;,\\\&amp;#34;sku\\\&amp;#34;:\\\&amp;#34;2016-Datacenter\\\&amp;#34;,\\\&amp;#34;osType\\\&amp;#34;:\\\&amp;#34;Windows\\\&amp;#34;,\\\&amp;#34;version\\\&amp;#34;:\\\&amp;#34;latest\\\&amp;#34;}\&amp;#34;&amp;#34;&lt;/span>
+&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Not how I wanted it to look, at all. The above parameter value contains two image references that should help with adding additional values if you need to add more. It might help to break the value up onto multiple lines to help visualise what part you&amp;rsquo;ll need to copy/paste.&lt;/p>
+&lt;h3 id="unfinished-policies">Unfinished Policies&lt;/h3>
+&lt;p>Unfortunately, I&amp;rsquo;ve not managed to template for policies: &lt;code>UserOwnedLabVmCountInSubnet&lt;/code>, &lt;code>LabTargetCost&lt;/code>, &lt;code>EnvironmentTemplate&lt;/code> and &lt;code>ScheduleEditPermission&lt;/code>. I&amp;rsquo;ll come back to them but just in case I don&amp;rsquo;t in the near future (or, ever) I&amp;rsquo;ve listed some references that may or may not be helpful.&lt;/p>
+&lt;p>My approach to find the correct values for each policy has been to make the change in the Azure Portal then retrieve the Policy details back via PowerShell. I used a couple lines of script borrowed from the &lt;a class="link" href="https://docs.microsoft.com/en-gb/azure/devtest-labs/scripts/set-allowed-vm-sizes-in-lab#sample-script" target="_blank" rel="noopener"
+>DevTest Labs documentation&lt;/a>&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="nv">$lab&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nb">Get-AzResource&lt;/span> &lt;span class="n">-ResourceType&lt;/span> &lt;span class="s1">&amp;#39;Microsoft.DevTestLab/labs&amp;#39;&lt;/span> &lt;span class="n">-ResourceName&lt;/span> &lt;span class="n">myDevTestLab&lt;/span>
+&lt;span class="nv">$labResourceName&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="nv">$lab&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Name&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="s1">&amp;#39;/default&amp;#39;&lt;/span>
+&lt;span class="nv">$existingPolicy&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">Get-AzResource&lt;/span> &lt;span class="n">-ResourceType&lt;/span> &lt;span class="s1">&amp;#39;Microsoft.DevTestLab/labs/policySets/policies&amp;#39;&lt;/span> &lt;span class="n">-ResourceName&lt;/span> &lt;span class="nv">$labResourceName&lt;/span> &lt;span class="n">-ResourceGroupName&lt;/span> &lt;span class="nv">$lab&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ResourceGroupName&lt;/span> &lt;span class="n">-ApiVersion&lt;/span> &lt;span class="n">2016&lt;/span>&lt;span class="p">-&lt;/span>&lt;span class="n">05&lt;/span>&lt;span class="p">-&lt;/span>&lt;span class="n">15&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>You can update $existingPolicy whenever you make a change to the policies.&lt;/p>
+&lt;p>&lt;code>$existingPolicy.Count&lt;/code> - will return the number of configured policy resources.
+&lt;code>$existingPolicy[0]&lt;/code> - will return the first policy configured on the DevTest lab.
+&lt;code>$existingPolicy[0].Properties&lt;/code> - will return the properties of a configured policy. It&amp;rsquo;s this information that you&amp;rsquo;ll need to configure policies.
+In the case of at least GalleyImage you might find it easier to read if you run &lt;code>$existingPolicy[0].Properties.threshold | ConvertFrom-Json&lt;/code>&lt;/p>
+&lt;h3 id="references">References&lt;/h3>
+&lt;p>&lt;a class="link" href="https://docs.microsoft.com/en-gb/azure/templates/microsoft.devtestlab/labs" target="_blank" rel="noopener"
+>ARM Docs: DevTest Labs&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://docs.microsoft.com/en-gb/azure/templates/microsoft.devtestlab/labs/policysets/policies" target="_blank" rel="noopener"
+>ARM Docs: DevTest Labs Policies&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://integrationworkz.antiohne.nl/2018/11/deploy-with-arm-templates-azure-devtest.html" target="_blank" rel="noopener"
+>GalleryImage&lt;/a> - The blog that helped me solve GalleryImage.&lt;/p></description></item></channel></rss>
