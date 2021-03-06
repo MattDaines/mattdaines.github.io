@@ -6,11 +6,11 @@ date = "2021-03-06"
 description = "Getting started with a static site hosted on Github Pages using Hugo static site generator."
 tags = [
     "Hugo",
-    "Github Pages"
+    "Github"
 ]
 categories = [
     "Hugo",
-    "Github Pages"
+    "Github"
 ]
 series = ["Hugo Blog"]
 aliases = ["hugo-blog"]
@@ -139,7 +139,7 @@ And that's it! Here are some references that helped me get setup.
 
 [Stack Hugo Theme](https://github.com/CaiJimmy/hugo-theme-stack)
 
-[Stack Hugo Theme Documentation](https://docs.stack.jimmycai.com/writing)
+[Stack Hugo Theme Documentation](https://docs.stack.jimmycai.com)
 
 [Github Github Pages Actions](https://github.com/peaceiris/actions-gh-pages)
 
