@@ -3,6 +3,8 @@
 *.a
 *.so
 
+assets/jsconfig.json
+
 # Folders
 _obj
 _test
