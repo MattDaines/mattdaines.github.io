@@ -125,7 +125,7 @@ jobs:
           publish_dir: ./public
 ```
 
-### References
+## References
 
 And that's it! Here are some references that helped me get setup.
 
