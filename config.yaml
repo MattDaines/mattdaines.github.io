@@ -1,11 +1,11 @@
-baseurl: https://mattdaines.github.io
+baseurl: https://blog.mattdaines.me
 languageCode: en-gb
 theme: hugo-theme-stack
 paginate: 5
 title: Matt Daines
 
 # Change it to your Disqus shortname before using
-disqusShortname: hugo-theme-stack
+disqusShortname: mattdaines
 
 # GA Tracking ID
 googleAnalytics:
@@ -43,7 +43,7 @@ params:
     article:
         math: false
         license:
-            enabled: true
+            enabled: false
             default: Licensed under CC BY-NC-SA 4.0
 
     comments:
