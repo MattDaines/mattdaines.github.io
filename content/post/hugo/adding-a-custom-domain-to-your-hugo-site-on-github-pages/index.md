@@ -3,7 +3,7 @@
 author = "Matt Daines"
 title = "Adding a Custom Domain to your Hugo Site on Github Pages"
 date = "2021-03-07"
-description = "A step by step walk through on adding your custom domain to your Github Pages using Hugo as a static site generator."
+description = "Have your own domain name? Why not use it on your Hugo powered blog?! 💪 A step by step walk through to add your domain to your Github Pages using Hugo as a static site generator."
 tags = [
     "Hugo",
     "Github"

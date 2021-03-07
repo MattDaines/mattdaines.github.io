@@ -2,8 +2,7 @@
 author = "Matt Daines"
 title = "Getting Started with Hugo hosted on Github Pages"
 date = "2021-03-06"
-
-description = "Getting started with a static site hosted on Github Pages using Hugo static site generator."
+description = "Using Hugo, Github Pages and Github Actions we look at how this blog was built and how you can start your own!"
 tags = [
     "Hugo",
     "Github"
