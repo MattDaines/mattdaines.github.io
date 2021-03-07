@@ -2,8 +2,7 @@
 author = "Matt Daines"
 title = "Building DevTest Labs ARM Template Policies"
 date = "2021-02-15"
-
-description = "A guide to building DevTest Labs Policies ARM templates."
+description = "Deploying Azure DevTest Labs Policies with ARM Templates. An incomplete guide to some challenging Azure resources."
 tags = [
     "Azure",
     "DevTest Labs",
@@ -13,8 +12,8 @@ categories = [
     "Azure",
     "IaC"
 ]
-series = ["Azure Resource Manager (ARM) Templating"]
-aliases = ["arm-templating"]
+series = ["arm-templates"]
+aliases = ["arm-templates"]
 +++
 
 I've recently been ARM templating again! In this article I'll go through how I've templated a relatively troublesome resource: `Microsoft.DevTestLab/labs/policysets/policies`. The documentation for this resource type is quite scarce so I figured I'd try figure out how to template at least some of the policies. Maybe you'll find something useful.
