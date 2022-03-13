@@ -27,6 +27,8 @@ So, what do I want to achieve? I want to keep on leanin', that's for sure! Short
 
 ### Certification
 
+Microsoft certification I've achieved. Links provided to verify my credentials 😊
+
 * [Azure Solutions Architect Expert](https://www.credly.com/badges/1b9ea08a-bd9a-4a69-9528-041dfdd054a5/public_url)
 * [Azure Security Engineer Associate](https://www.credly.com/badges/c24b3122-82c9-4a1f-9b0b-642ef7ba2d6d/public_url)
 * [Azure Administrator Associate](https://www.credly.com/badges/a013474e-7878-4bfb-9ce9-ce217f813e52/public_url)
