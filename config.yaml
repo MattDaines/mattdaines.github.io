@@ -148,7 +148,12 @@ menu:
           params:
               icon: brand-github
 
-        
+        - identifier: pluralsight
+          weight: 80
+          name: Pluralsight
+          url: https://app.pluralsight.com/profile/matthew-daines
+          params:
+              icon: pluralsight
 
 related:
     includeNewer: true
