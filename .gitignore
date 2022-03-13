@@ -27,3 +27,4 @@ _testmain.go
 /public
 /resources
 .DS_Store
+.vscode/settings.json
