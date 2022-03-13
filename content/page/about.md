@@ -35,3 +35,4 @@ Microsoft certification I've achieved. Links provided to verify my credentials ð
 * [Azure Fundamentals](https://www.credly.com/badges/b1fdb056-234c-4887-90d1-d5cfcd38d0f2/public_url)
 * [Microsoft 365 Fundamentals](https://www.credly.com/badges/775ccfd1-80db-456e-a674-d6150dd1f9ee/public_url)
 * [Security, Compliance, and Identity Fundamentals](https://www.credly.com/badges/d6c09d2e-4b5a-48c2-a887-199e4673e549/public_url)
+* [Azure AI Fundamentals](https://www.credly.com/badges/ddbd1232-3b41-47a8-8e09-69db195c0be4/public_url)
