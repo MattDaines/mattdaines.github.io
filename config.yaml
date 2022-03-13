@@ -35,7 +35,7 @@ params:
 
     sidebar:
         emoji: 👨🏻‍💻
-        subtitle: An Azure engineer's scrapbook.
+        subtitle: Azure security and infrastructure consultant. Welcome to my scrapbook!
         avatar:
             local: true
             src: img/avatar.jpeg
@@ -102,25 +102,53 @@ menu:
           name: Home
           url: /
           weight: -100
-          pre: home
+          params: 
+            icon: home
 
         - identifier: about
           name: About
           url: /about/
           weight: -90
-          pre: user
+          params: 
+            icon: user
 
         - identifier: archives
           name: Archives
           url: /archives/
           weight: -70
-          pre: archives
+          params: 
+            icon: archives
 
         - identifier: search
           name: Search
           url: /search/
           weight: -60
-          pre: search
+          params: 
+            icon: search
+
+    social:
+        - identifier: twitter
+          weight: 50
+          name: Twitter
+          url: https://twitter.com/MatthewDaines1
+          params:
+              icon: brand-twitter
+
+        - identifier: linkedin
+          weight: 60
+          name: LinkedIn
+          url: https://www.linkedin.com/in/matthew-daines/
+          params:
+              icon: brand-linkedin
+
+        - identifier: github
+          weight: 70
+          name: GitHub
+          url: https://github.com/MattDaines
+          params:
+              icon: brand-github
+
+        
 
 related:
     includeNewer: true
