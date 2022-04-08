@@ -112,12 +112,12 @@ menu:
           params: 
             icon: user
 
-        - identifier: archives
-          name: Archives
-          url: /archives/
-          weight: -70
-          params: 
-            icon: archives
+        #- identifier: archives
+        #  name: Archives
+        #  url: /archives/
+        #  weight: -70
+        #  params: 
+        #    icon: archives
 
         - identifier: search
           name: Search
