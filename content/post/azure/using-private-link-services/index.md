@@ -1,11 +1,12 @@
 +++
 author = "Matt Daines"
 title = "Using Private Link Services for Connectivity Between Azure Tenants"
-date = "2022-02-23"
+date = "2022-04-08"
 description = "Using Private Link Services to enable private connectivity between a service in two or more Azure tenants."
 tags = [
+    "Azure Architecture",
     "Azure Networking",
-    "Azure Platform"
+    "Walk-Through"
 ]
 categories = [
     "Azure",
