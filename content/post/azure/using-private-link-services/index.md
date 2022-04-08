@@ -21,7 +21,7 @@ Hey there! In this post I'm going to talk about the design and implement of Priv
 
 ### What is a Private Link?
 
-First, the fundamentals. Private Link enables you to create Private **Endpoints** for PaaS services (Key Vault, Storage Accounts, etc) within your Azure virtual networks. This means services that are deployed or integrated within your Azure virtual network can communicate with that PaaS service over an endpoint that cannot be reached from the Internet. Using private endpoints to reduce the attack surface area is quite common to contribute to a Defence in Depth strategy.
+First, the fundamentals. Private Link enables you to create Private **Endpoints** for PaaS services (Key Vault, Storage Accounts, etc) within your Azure virtual networks. This means services that are deployed or integrated within your Azure virtual network can communicate with that PaaS service over an endpoint that cannot be reached from the Internet. Using private endpoints to reduce the attack surface is quite common to contribute to a Defence in Depth strategy.
 
 Private Link Services are another feature of Private Link that enables _you_ to provide a service and allow others to _subscribe_ to it over a private endpoint in their own network. Connections to a private endpoint never leave Microsoft's backbone over the Internet, even when the private endpoint is in a different Azure region to where the private link service is hosted.
 
@@ -29,20 +29,20 @@ One example of private link services is a SaaS provider that enables you to _sub
 
 ### When would I use a Private Link Service?
 
-Software-as-a-Service is so incredibly broad that this private link service shaped shoe definitely does not fit all but there are certainly some providers where private link services could be beneficial. For example, if your service requires an agent to be installed on virtual machines and send data to your public endpoint that could be a deal breaker for regulated customers.
+Software-as-a-Service is so incredibly broad that this private link service shaped shoe does not fit all. But there are certainly some providers where private link services could be beneficial. For example, if your service requires an agent to be installed on virtual machines to send data or telemetry back to your service also in Azure. If this connection is over a public endpoint that could be a deal breaker for regulated customers.
 
-Some Azure customers opt for a multi-tenant deployment, for one reason or another. Private link services can enable systems/services in one of your tenants to consume an application in another potentially mitigating additional licence, compute, storage and operational costs.
+Some Azure customers opt for a multi-tenant deployment, for one reason or another. Private link services can enable systems/services in one of your tenants to consume an application in another potentially mitigating additional licence, compute, storage, and operational costs. If the customer has opted for multi-tenant, then that likely rules out virtual network peering (which, to my recent surprise, is possible between tenants!)
 
-And for my third use case maybe your virtual networks are deployed as _islands_ (virtual networks that have no centralised connectivity) within a single tenant. Quite often these island virtual networks have overlapping address space which is problematic when a service in one virtual network needs to consume from a service in another virtual network as peering cannot be used. One alternate solution is to deploy two virtual network gateways and connect them with a site-to-site link. However, this is not a cost efficient way of handing this problem. Private link services NATs the connection into the provider's virtual network. So, from the providers point of view the connection _appears_ to come from their own network and not the subscriber's network.
+And for my third use case maybe your virtual networks are deployed as _islands_ (virtual networks that have no centralised connectivity) within a single tenant. Quite often these island virtual networks have overlapping address space which is problematic when a service in one virtual network needs to consume from a service in another virtual network as peering cannot be used. Private link services NATs the connection into the provider’s virtual network. So, from the providers point of view the connection _appears_ to come from their own network and not the subscriber’s network.
 
-As the provider you can see the subscriber's IP if you configure the TCP V2 proxy however your application will need to support the headers. If your application cannot parse the headers then the connection will not be allowed. More information on [Microsoft Docs](https://docs.microsoft.com/en-gb/azure/private-link/private-link-service-overview#getting-connection-information-using-tcp-proxy-v2).
+As the provider you can see the subscriber’s IP if you configure the TCP V2 proxy however your application will need to support the headers. If your application cannot parse the headers, then the connection will not be allowed. More information on [Microsoft Docs](https://docs.microsoft.com/en-gb/azure/private-link/private-link-service-overview#getting-connection-information-using-tcp-proxy-v2).
 
 ### Setting Up a Private Link Service
 
 Right, now the hands on section! But first lets paint the picture of our scenario. The non-tech part is really a pick your own story:
 
 - A single organisation uses multiple tenants to separate their pre-production and production environments. However, the Production environment needs to occasionally pull data from the pre-production system.
-- An organisation has recently acquired another company and needs to integrate systems between services in two tenants.
+- An organisation has recently acquired another company and needs to quickly integrate systems between services in two tenants.
 - Developers within an organisation deploy their applications to virtual network pods/islands, all configured with `10.0.0.0/16` networks but need to send health probes to another service with overlapping address space.
 
 Fundamentally, what we're going to setup is a `Provider` virtual machine that's running IIS and a `Subscriber` virtual machine in another virtual network in another tenant. After all is configured the `subscriber` virtual machine will be able to see the IIS site without using public domain names or public IP addressing.
@@ -58,7 +58,7 @@ If you're familiar with the process of the steps detailed below feel free to ski
 5) [Create an internal Azure load balancer](#create-and-configure-an-internal-load-balancer-for-the-provider-service)
 6) [Create a Private Link Service](#create-your-provider-private-link-service)
 
-**The Request Process**
+**Request The Private Link Service**
 
 7) [Requesting Access to a Private Link Service](#requesting-access-to-a-private-link-service)
 8) [Provider Approval](#provider-approval)
@@ -74,12 +74,12 @@ Quick Setup Steps:
 - Create a virtual network with two subnets named:
     - `AzureBastionSubnet`
     - `Provider`
-- Deploy a `basic` sku Azure Bastion to the virtual network
-- The address space you use doesn't matter. It can overlap with your subscriber network when we get to provisioning that
+- Deploy a `basic` sku Azure Bastion to the virtual network.
+- The address space you use doesn't matter. It can overlap with your subscriber network when we get to provisioning that.
 
 [Next Step - Create the Provider VM](#create-the-provider-virtual-machine) OR follow the detailed steps below:
 
-![Create a new virtual network](imgs/01-CreateVirtualNetwork/01-Create.png)
+![Create a new virtual network.](imgs/01-CreateVirtualNetwork/01-Create.png)
 
 ![Create a new resource group for the provider resources (PrivateLinkService is a more fitting name, I made a typo!)](imgs/01-CreateVirtualNetwork/02-NewRG.png)
 
@@ -112,11 +112,11 @@ Quick Setup Steps:
 Quick Setup Steps:
 
 - Create a Windows Server virtual machine capable of installing the IIS role.
-- The virtual machine should not have a public IP address
+- The virtual machine should not have a public IP address.
 
 [Next Step - Create the Subscriber Infrastructure](#create-the-subscriber-infrastructure) OR follow the detailed steps below:
 
-![Go to Virtual Machines and create an Azure Virtual Machine](imgs/03-CreateProviderVM/01-Create.png)
+![Go to Virtual Machines and create an Azure Virtual Machine.](imgs/03-CreateProviderVM/01-Create.png)
 
 ![Name your virtual machine, I named mine provider-vm. For the image I selected "Windows Server 2022 Datacenter: Azure Edition - Gen 2", not sure why Portal isn't displaying that! As this is a demo we have no need to configure availability redundancy.](imgs/03-CreateProviderVM/02-Create-ProviderVM-Basics01.png)
 
@@ -132,11 +132,11 @@ Quick Setup Steps:
 
 ![We can skip over the Advanced tab as there is nothing we need to do there. I did however apply my tags!](imgs/03-CreateProviderVM/06-Create-ProviderVM-Tags.png)
 
-![My VM create review page 1/3](imgs/03-CreateProviderVM/07-Create-ProviderVM-Review01.png)
+![My VM create review page 1/3.](imgs/03-CreateProviderVM/07-Create-ProviderVM-Review01.png)
 
-![My VM create review page 2/3](imgs/03-CreateProviderVM/07-Create-ProviderVM-Review02.png)
+![My VM create review page 2/3.](imgs/03-CreateProviderVM/07-Create-ProviderVM-Review02.png)
 
-![My VM create review page 3/3](imgs/03-CreateProviderVM/07-Create-ProviderVM-Review03.png)
+![My VM create review page 3/3.](imgs/03-CreateProviderVM/07-Create-ProviderVM-Review03.png)
 
 #### Create the Subscriber Infrastructure
 
@@ -231,7 +231,7 @@ Quick Setup Steps:
 
 - In the provider tenant create a `Private Link Service` from the [Private Link Center](https://portal.azure.com/#blade/Microsoft_Azure_Network/PrivateLinkCenterBlade/overview).
 - The name of the private link scope forms part of an alias that is shared to enable others to connect to the service. The naming convention looks like: `<name>.<guid>.<region>.azure.privatelinkservice`
-- Select the internal load balancer.
+- Select the internal load balancer you created earlier.
 - For the NAT subnet select the Provider virtual network and subnet. This is the subnet that network interfaces are deployed to for the private link service's outbound connections. At the time of writing, there can be a maximum of 8 NAT IPs.
 - Ensure Enable TCP Proxy V2 is set to **No**.
 - Private IP Address settings is where you configure how many NAT interfaces to deploy. For the demo, I've left just one interface.
@@ -312,7 +312,7 @@ Quick Setup Steps:
 
 ### Wrapping Up
 
-Question? Feel free to use Disqus at the bottom of the post, or my socials on [Twitter](https://twitter.com/MatthewDaines1) or [LinkedIn](https://www.linkedin.com/in/matthew-daines/).
+Questions? Feel free to use Disqus at the bottom of the post, or my socials on [Twitter](https://twitter.com/MatthewDaines1) or [LinkedIn](https://www.linkedin.com/in/matthew-daines/).
 
 If something didn't work how it was supposed to, do let me know and I'll go through and try to replicate and fix the guide.
 
