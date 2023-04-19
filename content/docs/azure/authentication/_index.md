@@ -2,14 +2,8 @@
 bookCollapseSection: true
 ---
 
-# Section
+# Azure - Authentication
 
-How to do SQL stuff.
-
-## Example
-
-```tpl
-{{</* section */>}}
-```
+Authenticating to all thing Azure.
 
 {{<section>}}
