@@ -26,9 +26,9 @@ So I only needed three icons for what I wanted to do. I needed an icon for:
 - Azure DevOps
 - GitHub
 
-These three can be found in my GitHub - [MattDaines - Folder Icons](https:\\github.com\MattDaines\Folder-Icons).
+These three can be found in my GitHub - [MattDaines - Folder Icons](https://github.com/MattDaines/Folder-Icons).
 
-If you want to create your own icons you should know that Windows expects the file format to be a `.ICO`, `.ICL`, `.EXE`, or a `.DLL` (possibly maybe others, but Windows gives the hint when you select `Browse` when changing the icon!). I chose to create .ICO files because I figured it was likely the easiest format for me to convert regular image file formats such as `.JPG`, `.PNG` etc, into an `.ICO`. It was made easy by another repository I found: [FoxP - PNG-to-ICO](https:\\github.com\FoxP\PNG-to-ICO); so thanks for that! 😊
+If you want to create your own icons you should know that Windows expects the file format to be a `.ICO`, `.ICL`, `.EXE`, or a `.DLL` (possibly maybe others, but Windows gives the hint when you select `Browse` when changing the icon!). I chose to create .ICO files because I figured it was likely the easiest format for me to convert regular image file formats such as `.JPG`, `.PNG` etc, into an `.ICO`. It was made easy by another repository I found: [FoxP - PNG-to-ICO](https://github.com/FoxP/PNG-to-ICO); so thanks for that! 😊
 
 ## Update Icons
 
