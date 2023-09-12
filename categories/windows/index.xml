@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Windows on Technology Notebook</title><link>https://notebook.mattdaines.me/categories/windows/</link><description>Recent content in Windows on Technology Notebook</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Tue, 09 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://notebook.mattdaines.me/categories/windows/index.xml" rel="self" type="application/rss+xml"/><item><title>Enabling/Disabling Network Level Authentication (NLA)</title><link>https://notebook.mattdaines.me/p/enabling/disabling-network-level-authentication-nla/</link><pubDate>Tue, 09 May 2023 00:00:00 +0000</pubDate><guid>https://notebook.mattdaines.me/p/enabling/disabling-network-level-authentication-nla/</guid><description>&lt;blockquote>
+&lt;p>The remote computer that you are trying to connect to requires Network Level Authentication (NLA), but your Windows domain controller cannot be contacted to perform NLA. If you are an administrator on the remote computer, you can disable NLA by using the options on the Remote tab of the System Properties dialog box.&lt;/p>
+&lt;/blockquote>
+&lt;p>A frustrating error that you may occasionally bump into while configuring Windows server infrastructure. It&amp;rsquo;s likely that a networking issue is preventing the member server from contacting the domain controller. Even after the networking issue is resolved, a domain admin (or, another privileged admin) would need to re-establish the trust to the domain controller from the member server.&lt;/p>
+&lt;p>My, admittedly somewhat limited knowledge of the issue of why this happens is when the domain member tries to reset it&amp;rsquo;s own password/credential and can&amp;rsquo;t due to a network issue (I&amp;rsquo;m sure there&amp;rsquo;s other reason, but that&amp;rsquo;s the most common from my personal experience). The machine password expires and then the member server cannot authenticate to the domain, which is part of the authentication process for domain accounts when NLA is enabled.&lt;/p>
+&lt;p>This page will list a few PowerShell cmdlets that I run when I&amp;rsquo;m happy that the member server can be brought back. Just don&amp;rsquo;t forget to re-enable NLA once you&amp;rsquo;re the computer is trusted again.&lt;/p>
+&lt;h2 id="disable-network-level-authentication-nla">Disable Network Level Authentication (NLA)&lt;/h2>
+&lt;p>In Azure, you likely need to run this from the Run Command blade on the target virtual machine.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="nb">Get-WmiObject&lt;/span> &lt;span class="n">-class&lt;/span> &lt;span class="n">Win32_TSGeneralSetting&lt;/span> &lt;span class="n">-Namespace&lt;/span> &lt;span class="n">root&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">cimv2&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">terminalservices&lt;/span> &lt;span class="n">-ComputerName&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hostname&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">-Filter&lt;/span> &lt;span class="s2">&amp;#34;TerminalName=&amp;#39;RDP-tcp&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="py">SetUserAuthenticationRequired&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You should now be able to remote on with the local administrator account. If you&amp;rsquo;re not sure what the local administrator account is, you can use the Reset Password blade in the Azure portal - this creates a new local admin account if it does not already exist or resets the password if it does.&lt;/p>
+&lt;h2 id="domain-trust">Domain Trust&lt;/h2>
+&lt;p>If you successfully remote onto the virtual machine with the local admin credential, you can now reset the computer password and re-establish the trust with the domain.&lt;/p>
+&lt;p>For &lt;code>&amp;lt;Domain&amp;gt;\&amp;lt;User&amp;gt;&lt;/code> you&amp;rsquo;ll want to use the domain account, not the local account. You&amp;rsquo;ll be prompted for the password.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Reset-ComputerMachinePassword&lt;/span> &lt;span class="n">-Credential&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">Domain&lt;/span>&lt;span class="p">&amp;gt;\&amp;lt;&lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="enable-network-level-authentication-nla">Enable Network Level Authentication (NLA)&lt;/h2>
+&lt;p>Assuming the &lt;code>Reset-ComputerMachinePassword&lt;/code> succeeded, you can now re-enable NLA and log back on with your domain account.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="nb">Get-WmiObject&lt;/span> &lt;span class="n">-class&lt;/span> &lt;span class="n">Win32_TSGeneralSetting&lt;/span> &lt;span class="n">-Namespace&lt;/span> &lt;span class="n">root&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">cimv2&lt;/span>&lt;span class="p">\&lt;/span>&lt;span class="n">terminalservices&lt;/span> &lt;span class="n">-ComputerName&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hostname&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">-Filter&lt;/span> &lt;span class="s2">&amp;#34;TerminalName=&amp;#39;RDP-tcp&amp;#39;&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="py">SetUserAuthenticationRequired&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mf">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>
