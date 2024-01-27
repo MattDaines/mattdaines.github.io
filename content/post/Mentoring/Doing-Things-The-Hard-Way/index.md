@@ -1,5 +1,5 @@
 ---
-title: Doing Things The Hardway
+title: Doing Things The Hard Way
 description: Why you shouldn't always take the easy option when it's available.
 date: 2024-01-27 00:00:00+0000
 image: header-image.png
